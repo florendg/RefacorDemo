@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class StatementProcessorTest {
 
     private static String INVOICE;
-    private static String PLATS;
+    private static String PLAYS;
 
     @BeforeAll
     static void loadTestData() throws Exception {
@@ -19,9 +19,9 @@ class StatementProcessorTest {
         assertNotNull(INVOICE);
 
         path=StatementProcessor.class.getResource("/plays.json").getFile();
-        PLATS = Files.readString(Path.of(path));
+        PLAYS = Files.readString(Path.of(path));
 
-        assertNotNull(PLATS);
+        assertNotNull(PLAYS);
     }
 
     @Test
@@ -34,6 +34,6 @@ class StatementProcessorTest {
                   As You Like It: $500.00 (35 seats)
                   Othello: $500.00 (40 seats)
                 Amount owed is $1,730.00
-                """, sut.statement(INVOICE,PLATS));
+                """, sut.statement(INVOICE, PLAYS));
     }
 }
