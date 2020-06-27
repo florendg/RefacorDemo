@@ -1,7 +1,7 @@
 package dev.weirdduke.refactor;
 
-import com.google.gson.*;
-import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import model.Invoice;
 import model.Performance;
@@ -9,7 +9,9 @@ import model.Play;
 
 import java.lang.reflect.Type;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Currency;
+import java.util.Locale;
+import java.util.Map;
 
 public class StatementProcessor {
 
