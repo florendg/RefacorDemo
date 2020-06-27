@@ -24,7 +24,7 @@ public class StatementProcessor {
         var plays = parsePlays(playsJson);
         var totalAmount = 0;
         var volumeCredits = 0;
-        var result = "Statement for " + invoice.customer + "\n";
+        StringBuilder result = new StringBuilder("Statement for " + invoice.customer + "\n");
 
         NumberFormat format = NumberFormat.getInstance(Locale.US);
         format.setMinimumFractionDigits(2);
@@ -32,35 +32,35 @@ public class StatementProcessor {
 
         for (Performance performance : invoice.performances) {
             var play = plays.get(performance.getPlayID());
-            var thisAmount = 0;
-            switch (play.getType()) {
-                case "tragedy":
-                    thisAmount = 40_000;
+            var thisAmount = switch (play.getType()) {
+                case "tragedy" -> {
+                    var amount = 40_000;
                     if (performance.getAudience() > 30) {
-                        thisAmount += 1_000 * (performance.getAudience() - 30);
+                        amount += 1_000 * (performance.getAudience() - 30);
                     }
-                    break;
-                case "comedy":
-                    thisAmount = 30_000;
+                    yield amount;
+                }
+                case "comedy" -> {
+                    var amount = 30_000;
                     if (performance.getAudience() > 20) {
-                        thisAmount += 10_000 + 500 * (performance.getAudience() - 20);
+                        amount += 10_000 + 500 * (performance.getAudience() - 20);
                     }
-                    thisAmount += 300 * performance.getAudience();
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown play type");
-            }
+                    amount += 300 * performance.getAudience();
+                    yield amount;
+                }
+                default -> throw new IllegalArgumentException("Unknown play type");
+            };
             volumeCredits += Math.max(performance.getAudience() - 30, 0);
             if("comedy".equalsIgnoreCase(play.getType())) {
                 volumeCredits += Math.floor(performance.getAudience() / 5.0);
             }
-            result += "  " + play.getName() + ": $" + format.format(thisAmount/100.0);
-            result += " (" + performance.getAudience() + " seats)\n";
+            result.append("  ").append(play.getName()).append(": $").append(format.format(thisAmount / 100.0));
+            result.append(" (").append(performance.getAudience()).append(" seats)\n");
             totalAmount += thisAmount;
         }
-        result += "Amount owed is $" + format.format(totalAmount/100.0) +"\n";
-        result += "You earned " + volumeCredits + " credits\n";
-        return result;
+        result.append("Amount owed is $").append(format.format(totalAmount / 100.0)).append("\n");
+        result.append("You earned ").append(volumeCredits).append(" credits\n");
+        return result.toString();
     }
 
     private Invoice parseInvoice(String invoice) {
