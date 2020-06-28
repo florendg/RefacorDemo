@@ -31,13 +31,9 @@ public class StatementProcessor {
         format.setMinimumFractionDigits(2);
 
         for (Performance performance : invoice.performances) {
-            Play play = playFor(plays, performance);
-            var thisAmount = amountFor(performance, play);
-            volumeCredits += Math.max(performance.getAudience() - 30, 0);
-            if ("comedy".equalsIgnoreCase(play.getType())) {
-                volumeCredits += Math.floor(performance.getAudience() / 5.0);
-            }
-            result.append("  ").append(play.getName()).append(": ").append(format.format(thisAmount / 100.0));
+            var thisAmount = amountFor(performance, playFor(plays, performance));
+            volumeCredits += volumeCreditsFor(plays, performance);
+            result.append("  ").append(playFor(plays, performance).getName()).append(": ").append(format.format(thisAmount / 100.0));
             result.append(" (").append(performance.getAudience()).append(" seats)\n");
             totalAmount += thisAmount;
         }
@@ -46,12 +42,20 @@ public class StatementProcessor {
         return result.toString();
     }
 
+    private int volumeCreditsFor(Map<String, Play> plays, Performance performance) {
+        int result = Math.max(performance.getAudience() - 30, 0);
+        if ("comedy".equalsIgnoreCase(playFor(plays, performance).getType())) {
+            result += Math.floor(performance.getAudience() / 5.0);
+        }
+        return result;
+    }
+
     private Play playFor(Map<String, Play> plays, Performance performance) {
-        var play = plays.get(performance.getPlayID());
-        if (play == null) {
+        var result = plays.get(performance.getPlayID());
+        if (result == null) {
             throw new IllegalArgumentException("Unknown play");
         }
-        return play;
+        return result;
     }
 
     private int amountFor(Performance performance, Play play) {
