@@ -10,5 +10,9 @@
   "othello": {
     "name": "Othello",
     "type": "tragedy"
+  },
+  "dirtyShit": {
+    "name": "Do Not Know",
+    "type": "Ughh"
   }
 }

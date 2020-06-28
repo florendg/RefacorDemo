@@ -32,6 +32,9 @@ public class StatementProcessor {
 
         for (Performance performance : invoice.performances) {
             var play = plays.get(performance.getPlayID());
+            if (play == null) {
+                throw new IllegalArgumentException("Unknown play");
+            }
             var thisAmount = switch (play.getType()) {
                 case "tragedy" -> {
                     var amount = 40_000;
