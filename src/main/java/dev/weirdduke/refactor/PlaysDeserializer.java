@@ -17,8 +17,7 @@ public class PlaysDeserializer implements JsonDeserializer<Map<String,Play>> {
     public Map<String, Play> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         return json.getAsJsonObject()
                 .entrySet().stream()
-                .collect(Collectors
-                            .toMap(Map.Entry::getKey,
-                                    e -> gson.fromJson(e.getValue(),Play.class)));
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        e -> gson.fromJson(e.getValue(), Play.class)));
     }
 }

@@ -9,7 +9,6 @@ import model.Play;
 
 import java.lang.reflect.Type;
 import java.text.NumberFormat;
-import java.util.Currency;
 import java.util.Locale;
 import java.util.Map;
 
@@ -28,9 +27,8 @@ public class StatementProcessor {
         var volumeCredits = 0;
         StringBuilder result = new StringBuilder("Statement for " + invoice.customer + "\n");
 
-        NumberFormat format = NumberFormat.getInstance(Locale.US);
+        NumberFormat format = NumberFormat.getCurrencyInstance(Locale.US);
         format.setMinimumFractionDigits(2);
-        format.setCurrency(Currency.getInstance("USD"));
 
         for (Performance performance : invoice.performances) {
             var play = plays.get(performance.getPlayID());
@@ -56,11 +54,11 @@ public class StatementProcessor {
             if("comedy".equalsIgnoreCase(play.getType())) {
                 volumeCredits += Math.floor(performance.getAudience() / 5.0);
             }
-            result.append("  ").append(play.getName()).append(": $").append(format.format(thisAmount / 100.0));
+            result.append("  ").append(play.getName()).append(": ").append(format.format(thisAmount / 100.0));
             result.append(" (").append(performance.getAudience()).append(" seats)\n");
             totalAmount += thisAmount;
         }
-        result.append("Amount owed is $").append(format.format(totalAmount / 100.0)).append("\n");
+        result.append("Amount owed is ").append(format.format(totalAmount / 100.0)).append("\n");
         result.append("You earned ").append(volumeCredits).append(" credits\n");
         return result.toString();
     }
