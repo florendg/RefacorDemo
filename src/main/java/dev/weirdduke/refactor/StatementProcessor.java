@@ -31,30 +31,10 @@ public class StatementProcessor {
         format.setMinimumFractionDigits(2);
 
         for (Performance performance : invoice.performances) {
-            var play = plays.get(performance.getPlayID());
-            if (play == null) {
-                throw new IllegalArgumentException("Unknown play");
-            }
-            var thisAmount = switch (play.getType()) {
-                case "tragedy" -> {
-                    var amount = 40_000;
-                    if (performance.getAudience() > 30) {
-                        amount += 1_000 * (performance.getAudience() - 30);
-                    }
-                    yield amount;
-                }
-                case "comedy" -> {
-                    var amount = 30_000;
-                    if (performance.getAudience() > 20) {
-                        amount += 10_000 + 500 * (performance.getAudience() - 20);
-                    }
-                    amount += 300 * performance.getAudience();
-                    yield amount;
-                }
-                default -> throw new IllegalArgumentException("Unknown play type");
-            };
+            Play play = playFor(plays, performance);
+            var thisAmount = amountFor(performance, play);
             volumeCredits += Math.max(performance.getAudience() - 30, 0);
-            if("comedy".equalsIgnoreCase(play.getType())) {
+            if ("comedy".equalsIgnoreCase(play.getType())) {
                 volumeCredits += Math.floor(performance.getAudience() / 5.0);
             }
             result.append("  ").append(play.getName()).append(": ").append(format.format(thisAmount / 100.0));
@@ -64,6 +44,35 @@ public class StatementProcessor {
         result.append("Amount owed is ").append(format.format(totalAmount / 100.0)).append("\n");
         result.append("You earned ").append(volumeCredits).append(" credits\n");
         return result.toString();
+    }
+
+    private Play playFor(Map<String, Play> plays, Performance performance) {
+        var play = plays.get(performance.getPlayID());
+        if (play == null) {
+            throw new IllegalArgumentException("Unknown play");
+        }
+        return play;
+    }
+
+    private int amountFor(Performance performance, Play play) {
+        return switch (play.getType()) {
+            case "tragedy" -> {
+                var amount = 40_000;
+                if (performance.getAudience() > 30) {
+                    amount += 1_000 * (performance.getAudience() - 30);
+                }
+                yield amount;
+            }
+            case "comedy" -> {
+                var amount = 30_000;
+                if (performance.getAudience() > 20) {
+                    amount += 10_000 + 500 * (performance.getAudience() - 20);
+                }
+                amount += 300 * performance.getAudience();
+                yield amount;
+            }
+            default -> throw new IllegalArgumentException("Unknown play type");
+        };
     }
 
     private Invoice parseInvoice(String invoice) {
